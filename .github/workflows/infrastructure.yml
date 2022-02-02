@@ -65,7 +65,10 @@ jobs:
           mod_name=`echo $file | cut -f1 -d'.'`
           target="br:$acr_name.azurecr.io/bicep/modules/$mod_name:$new_version"
 
-          cd /home/runner/work/l0-global-library/l0-global-library/infrastructure_templates/bicep
+          ls
 
-          az bicep publish --file $file --target $target
+          pwd
+          # cd /home/runner/work/l0-global-library/l0-global-library/infrastructure_templates/bicep
+
+          # az bicep publish --file $file --target $target
 
