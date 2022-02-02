@@ -55,5 +55,6 @@ jobs:
 
           # Re-assemble version string from Semver fields
           printf -v version '%d.%d.%d' "$major" "$minor" "$patch"
+          echo $version
           
 
