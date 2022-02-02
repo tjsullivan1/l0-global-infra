@@ -39,22 +39,30 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get Current Image Version & Build New Version
         run: |
-          echo ${{ github.event.head_commit.message }}
+          $msg = ${{ github.event.head_commit.message }}
+          echo $msg
           acr_name='tjsiacdemoacr'
           versions=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
 
-          echo $versions
+          current_latest=`echo $versions | sort -rV | head -1`
           # Read Semver fields
-          IFS=. read -r major minor patch <<<"$versions"
+          IFS=. read -r major minor patch <<<"$current_latest"
 
-          # Increment patch version
-          echo "$patch"
-          patch="$((patch + 1))"
-          echo "$patch"
-          # ((patch++))
+          if [[ "$msg" =~ ^version.* ]]; then
+            major="$((major + 1))"
+          elif [[ "$msg" =~ ^feat.* ]]; then
+            minor="$((minor + 1))"
+          else
+            # Increment patch version
+            echo "$patch"
+            patch="$((patch + 1))"
+            echo "$patch"
+            # ((patch++))
+          fi
+
 
           # Re-assemble version string from Semver fields
-          printf -v version '%d.%d.%d' "$major" "$minor" "$patch"
-          echo $version
+          printf -v new_version '%d.%d.%d' "$major" "$minor" "$patch"
+          echo $new_version
           
 
