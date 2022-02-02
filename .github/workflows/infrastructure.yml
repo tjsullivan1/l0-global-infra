@@ -39,7 +39,8 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get Current Image Version & Build New Version
         run: |
-          $msg = ${{ github.event.head_commit.message }}
+          echo ${{ github.event.head_commit.message }}
+          msg= ${{ github.event.head_commit.message }}
           echo $msg
           acr_name='tjsiacdemoacr'
           versions=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
@@ -59,6 +60,7 @@ jobs:
             echo "$patch"
             # ((patch++))
           fi
+
 
 
           # Re-assemble version string from Semver fields
