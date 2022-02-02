@@ -40,7 +40,8 @@ jobs:
       - name: Get Current Image Version & Build New Version
         run: |
           echo ${{ github.event.head_commit.message }}
-          versions=`az acr repository show-tags --name  ${{ secrets.acr_login_server }} --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
+          acr_name=`echo ${{ secrets.acr_login_server }} | awk -F. '{print $1}'`
+          versions=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
 
           # Read Semver fields
           IFS=. read -r major minor patch <<<"$version"
