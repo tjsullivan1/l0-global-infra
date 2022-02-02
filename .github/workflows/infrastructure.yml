@@ -70,7 +70,7 @@ jobs:
           ls -a
           cd bicep
           pwd
-          # cd /home/runner/work/l0-global-library/l0-global-library/infrastructure_templates/bicep
-
-          # az bicep publish --file $file --target $target
+          ls -a
+          
+          az bicep publish --file $file --target $target
 
