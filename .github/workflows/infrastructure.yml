@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Infrastructure CI
+name: Bicep CI
 
 # Controls when the workflow will run
 on:
@@ -39,10 +39,10 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get Current Image Version & Build New Version
         run: |
-          echo ${{ github.event.head_commit.message }}
           msg="${{ github.event.head_commit.message }}"
           echo $msg
           acr_name='tjsiacdemoacr'
+          file="acr.bicep"
           versions=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
 
           current_latest=`echo $versions | sort -rV | head -1`
@@ -55,16 +55,19 @@ jobs:
             minor="$((minor + 1))"
           else
             # Increment patch version
-            echo "$patch"
             patch="$((patch + 1))"
-            echo "$patch"
-            # ((patch++))
           fi
-
-
 
           # Re-assemble version string from Semver fields
           printf -v new_version '%d.%d.%d' "$major" "$minor" "$patch"
           echo $new_version
-          
 
+          mod_name=`echo $file | cut -f1 -d'.'`
+          target="br:$acr_name.azurecr.io/bicep/modules/$mod_name:$new_version"
+
+          pushd infrastructure_templates/bicep
+
+          az bicep publish --file $file --target $target
+
+          popd
+  
