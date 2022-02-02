@@ -67,6 +67,8 @@ jobs:
 
           ls -a
           cd infrastructure_templates
+          ls -a
+          cd bicep
           pwd
           # cd /home/runner/work/l0-global-library/l0-global-library/infrastructure_templates/bicep
 
