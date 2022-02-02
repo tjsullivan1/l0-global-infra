@@ -40,7 +40,7 @@ jobs:
       - name: Get Current Image Version & Build New Version
         run: |
           echo ${{ github.event.head_commit.message }}
-          msg= ${{ github.event.head_commit.message }}
+          msg="${{ github.event.head_commit.message }}"
           echo $msg
           acr_name='tjsiacdemoacr'
           versions=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
