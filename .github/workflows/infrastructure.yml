@@ -71,6 +71,8 @@ jobs:
           cd bicep
           pwd
           ls -a
+
+          az bicep install
           
           az bicep publish --file $file --target $target
 
