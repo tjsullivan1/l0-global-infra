@@ -48,7 +48,9 @@ jobs:
           IFS=. read -r major minor patch <<<"$versions"
 
           # Increment patch version
+          echo "$patch"
           patch="$((patch + 1))"
+          echo "$patch"
           # ((patch++))
 
           # Re-assemble version string from Semver fields
