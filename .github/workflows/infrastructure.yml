@@ -43,14 +43,15 @@ jobs:
           acr_name='tjsiacdemoacr'
           versions=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"'`
 
-          # Read Semver fields
-          IFS=. read -r major minor patch <<<"$version"
+          echo $versions
+          # # Read Semver fields
+          # IFS=. read -r major minor patch <<<"$version"
 
-          # Increment patch version
-          # same as patch="$((patch + 1))"
-          ((patch++))
+          # # Increment patch version
+          # # same as patch="$((patch + 1))"
+          # ((patch++))
 
-          # Re-assemble version string from Semver fields
-          printf -v version '%d.%d.%d' "$major" "$minor" "$((patch))"
+          # # Re-assemble version string from Semver fields
+          # printf -v version '%d.%d.%d' "$major" "$minor" "$((patch))"
           
 
