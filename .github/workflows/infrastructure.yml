@@ -48,8 +48,8 @@ jobs:
           IFS=. read -r major minor patch <<<"$versions"
 
           # Increment patch version
-          # same as patch="$((patch + 1))"
-          ((patch++))
+          patch="$((patch + 1))"
+          # ((patch++))
 
           # Re-assemble version string from Semver fields
           printf -v version '%d.%d.%d' "$major" "$minor" "$((patch))"
