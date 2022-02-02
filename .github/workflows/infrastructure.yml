@@ -47,6 +47,7 @@ jobs:
 
           current_latest=`echo $versions | sort -rV | head -1`
           # Read Semver fields
+          echo $current_latest
           IFS=. read -r major minor patch <<<"$current_latest"
 
           if [[ "$msg" =~ ^version.* ]]; then
