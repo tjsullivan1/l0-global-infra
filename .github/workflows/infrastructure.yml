@@ -96,15 +96,6 @@ jobs:
           ## I would have liked this to have worked directly via the github event, but it doesn't work for some reason. 
           files=`git log --stat -n1 --oneline | grep .bicep | awk -F\| '{print $1}' | tr -d [:blank:]`
 
-          # echo "these files were added"
-          # echo $added_files
-          # echo "these files were modified"
-          # echo $modified_files
-
-          # echo "here is the full event"
-          # event="${{ toJSON(github.event.head_commit) }}"
-          # added_take2=`jq .added <<< "$event"`
-          # echo $added_take2
           for file in $files
           do
             get_version_and_build $acr_name $msg $file
