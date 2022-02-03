@@ -1,4 +1,4 @@
-// superficial commit
+// superficial commit 2
 @minLength(5)
 @maxLength(50)
 @description('Name of the azure container registry (must be globally unique)')

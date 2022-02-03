@@ -74,7 +74,7 @@ jobs:
               printf -v new_version '%d.%d.%d' "$major" "$minor" "$patch"
               echo $new_version
 
-              mod_name=`echo $file | cut -f1 -d'.'`
+              mod_name=`echo $file | sed 's/infrastructure_templates\/bicep\///' | cut -f1 -d'.'`
               target="br:$acr_name.azurecr.io/bicep/modules/$mod_name:$new_version"
 
               pushd infrastructure_templates/bicep
