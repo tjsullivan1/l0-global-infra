@@ -98,7 +98,8 @@ jobs:
 
           echo "here is the full event"
           event="${{ toJSON(github.event.head_commit) }}"
-          jq . <<< "$event"
+          added_take2=`jq .added <<< "$event"`
+          echo $added_take2
 
           get_version_and_build $acr_name $msg $file
 
