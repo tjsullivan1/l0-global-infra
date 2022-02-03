@@ -80,15 +80,11 @@ jobs:
               mod_name=`echo $file | sed 's/infrastructure_templates\/bicep\///' | cut -f1 -d'.'`
               target="br:$acr_name.azurecr.io/bicep/modules/$mod_name:$new_version"
 
-              pushd infrastructure_templates/bicep
-
               echo "DEBUG: file is $file"
               echo "DEBUG: target is $target"
             
               # This script will only work on existing image repos. We will test this and set to null otherwise
               az bicep publish --file $file --target $target
-
-              popd
             fi
           }
 
