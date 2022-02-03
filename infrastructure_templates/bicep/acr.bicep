@@ -1,5 +1,4 @@
 // superficial commit 7
-
 @minLength(5)
 @maxLength(50)
 @description('Name of the azure container registry (must be globally unique)')
@@ -19,14 +18,13 @@ param location string = resourceGroup().location
 @description('Tier of your Azure Container Registry.')
 param acrSku string = 'Basic'
 
+param submitted_tags object = {}
+
 // azure container registry
 resource acr 'Microsoft.ContainerRegistry/registries@2019-12-01-preview' = {
   name: acrName
   location: location
-  tags: {
-    displayName: 'Container Registry'
-    'container.registry': acrName
-  }
+  tags: submitted_tags
   sku: {
     name: acrSku
   }
