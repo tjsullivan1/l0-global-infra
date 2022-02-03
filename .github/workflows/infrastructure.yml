@@ -97,7 +97,8 @@ jobs:
           echo $modified_files
 
           echo "here is the full event"
-          echo ${{ toJSON(github.event.head_commit) }}
+          event="${{ toJSON(github.event.head_commit) }}"
+          echo $event
 
           get_version_and_build $acr_name $msg $file
 
