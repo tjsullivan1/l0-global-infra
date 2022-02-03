@@ -103,6 +103,7 @@ jobs:
             echo "DEBUG: supposedly the files exist"
             for file in $files
             do
+              echo "DEBUG: working on file $file"
               az bicep install
               get_version_and_build $acr_name $msg $file
             done
