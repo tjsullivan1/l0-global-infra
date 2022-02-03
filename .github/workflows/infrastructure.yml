@@ -100,7 +100,8 @@ jobs:
 
 
           ## I would have liked this to have worked directly via the github event, but it doesn't work for some reason. 
-          files=`git log --stat -n1 --oneline | grep .bicep | awk -F\| '{print $1}' | tr -d [:blank:]`
+          # The funky first grep, \| is to find files in the git log that were modified to prevent me from finding the commit message if it contains .bicep
+          files=`git log --stat -n1 --oneline | grep \| | grep .bicep | awk -F\| '{print $1}' | tr -d [:blank:]`
 
           echo "DEBUG: Files are $files"
           if [[ -z $files ]]
