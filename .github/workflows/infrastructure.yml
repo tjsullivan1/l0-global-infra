@@ -91,6 +91,14 @@ jobs:
           echo $msg
           acr_name='tjsiacdemoacr'
 
+          echo "these files were added"
+          echo $added_files
+          echo "these files were modified"
+          echo $modified_files
+
+          echo "here is the full event"
+          echo ${{ github.event.head_commit }}
+
           get_version_and_build $acr_name $msg $file
 
           # This script will only work on existing image repos. We will test this and set to null otherwise
