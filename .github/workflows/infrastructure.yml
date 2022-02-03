@@ -96,6 +96,8 @@ jobs:
           ## I would have liked this to have worked directly via the github event, but it doesn't work for some reason. 
           files=`git log --stat -n1 --oneline | grep .bicep | awk -F\| '{print $1}' | tr -d [:blank:]`
 
+          echo $files
+
           for file in $files
           do
             get_version_and_build $acr_name $msg $file
