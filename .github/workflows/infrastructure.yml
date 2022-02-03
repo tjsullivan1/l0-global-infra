@@ -88,16 +88,14 @@ jobs:
           # The pattern here is to expect a commit message to begin with "version" if we are bumping major and "feat" if minor
           # otherwise, we will increment patch versions
           msg="${{ github.event.head_commit.message }}"
-          added_files="${{ github.event.head_commit.added }}"
-          modified_files="${{ github.event.head_commit.added }}"
-          echo $msg
+
           acr_name='tjsiacdemoacr'
 
 
           ## I would have liked this to have worked directly via the github event, but it doesn't work for some reason. 
           files=`git log --stat -n1 --oneline | grep .bicep | awk -F\| '{print $1}' | tr -d [:blank:]`
 
-          echo $files
+          echo "DEBUG: Files are $files"
           if [[ -z $files ]]
           then
             echo "No bicep files have been updated."
