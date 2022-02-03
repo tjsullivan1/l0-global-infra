@@ -86,7 +86,7 @@ jobs:
               echo "DEBUG: target is $target"
             
               # This script will only work on existing image repos. We will test this and set to null otherwise
-              # az bicep publish --file $file --target $target
+              az bicep publish --file $file --target $target
 
               popd
             fi
