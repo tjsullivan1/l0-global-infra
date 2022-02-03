@@ -43,7 +43,7 @@ jobs:
           get_version_and_build () {
             acr_name=$1
             msg=$2
-            file="acr.bicep"
+            file=$3
             current_latest_json=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json || $null`
 
             if [[ -z $current_latest_json ]]
@@ -77,6 +77,7 @@ jobs:
 
               az bicep install
               
+              # This script will only work on existing image repos. We will test this and set to null otherwise
               az bicep publish --file $file --target $target
 
               popd
@@ -91,16 +92,20 @@ jobs:
           echo $msg
           acr_name='tjsiacdemoacr'
 
-          echo "these files were added"
-          echo $added_files
-          echo "these files were modified"
-          echo $modified_files
 
-          echo "here is the full event"
-          event="${{ toJSON(github.event.head_commit) }}"
-          added_take2=`jq .added <<< "$event"`
-          echo $added_take2
+          ## I would have liked this to have worked directly via the github event, but it doesn't work for some reason. 
+          files=`git log --stat -n1 --oneline | grep .bicep | awk -F\| '{print $1}' | tr -d [:blank:]`
 
-          get_version_and_build $acr_name $msg $file
+          # echo "these files were added"
+          # echo $added_files
+          # echo "these files were modified"
+          # echo $modified_files
 
-          # This script will only work on existing image repos. We will test this and set to null otherwise
+          # echo "here is the full event"
+          # event="${{ toJSON(github.event.head_commit) }}"
+          # added_take2=`jq .added <<< "$event"`
+          # echo $added_take2
+          for file in $files
+          do
+            get_version_and_build $acr_name $msg $file
+          done
