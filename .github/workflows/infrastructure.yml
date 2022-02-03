@@ -50,6 +50,8 @@ jobs:
             then
               echo "This version does not yet exist in ACR. Please manually create teh image in ACR first."
             else
+              echo "DEBUG: this repo $file did exist in acr"
+
               # we rely on semantic versioning to assume sorting will work correctly.
               current_latest=`echo $current_latest_json | jq '.[]' | tr -d '"' | sort -rV | head -1`
 
@@ -75,8 +77,7 @@ jobs:
 
               pushd infrastructure_templates/bicep
 
-              az bicep install
-              
+            
               # This script will only work on existing image repos. We will test this and set to null otherwise
               az bicep publish --file $file --target $target
 
@@ -101,8 +102,10 @@ jobs:
           then
             echo "No bicep files have been updated."
           else
+            echo "DEBUG: supposedly the files exist"
             for file in $files
             do
+              az bicep install
               get_version_and_build $acr_name $msg $file
             done
           fi
