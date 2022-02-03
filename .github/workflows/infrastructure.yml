@@ -39,37 +39,58 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get Current Image Version & Build New Version
         run: |
+
+          get_version_and_build () {
+            acr_name=$1
+            msg=$2
+            file="acr.bicep"
+            current_latest_json=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json || $null`
+
+            if [[ -z $current_latest_json ]]
+            then
+              echo "This version does not yet exist in ACR. Please manually create teh image in ACR first."
+            else
+              # we rely on semantic versioning to assume sorting will work correctly.
+              current_latest=`echo $current_latest_json | jq '.[]' | tr -d '"' | sort -rV | head -1`
+
+              # Read Semver fields
+              echo $current_latest
+              IFS=. read -r major minor patch <<<"$current_latest"
+
+              if [[ "$msg" =~ ^version.* ]]; then
+                major="$((major + 1))"
+              elif [[ "$msg" =~ ^feat.* ]]; then
+                minor="$((minor + 1))"
+              else
+                # Increment patch version
+                patch="$((patch + 1))"
+              fi
+
+              # Re-assemble version string from Semver fields
+              printf -v new_version '%d.%d.%d' "$major" "$minor" "$patch"
+              echo $new_version
+
+              mod_name=`echo $file | cut -f1 -d'.'`
+              target="br:$acr_name.azurecr.io/bicep/modules/$mod_name:$new_version"
+
+              pushd infrastructure_templates/bicep
+
+              az bicep install
+              
+              az bicep publish --file $file --target $target
+
+              popd
+            fi
+          }
+
+          # The pattern here is to expect a commit message to begin with "version" if we are bumping major and "feat" if minor
+          # otherwise, we will increment patch versions
           msg="${{ github.event.head_commit.message }}"
+          added_files="${{ github.event.head_commit.added }}"
+          modified_files="${{ github.event.head_commit.added }}"
           echo $msg
           acr_name='tjsiacdemoacr'
-          file="acr.bicep"
-          current_latest=`az acr repository show-tags --name $acr_name --repository bicep/modules/acr -o json | jq '.[]' | tr -d '"' | sort -rV | head -1`
 
-          # Read Semver fields
-          echo $current_latest
-          IFS=. read -r major minor patch <<<"$current_latest"
+          get_version_and_build $acr_name $msg $file
 
-          if [[ "$msg" =~ ^version.* ]]; then
-            major="$((major + 1))"
-          elif [[ "$msg" =~ ^feat.* ]]; then
-            minor="$((minor + 1))"
-          else
-            # Increment patch version
-            patch="$((patch + 1))"
-          fi
-
-          # Re-assemble version string from Semver fields
-          printf -v new_version '%d.%d.%d' "$major" "$minor" "$patch"
-          echo $new_version
-
-          mod_name=`echo $file | cut -f1 -d'.'`
-          target="br:$acr_name.azurecr.io/bicep/modules/$mod_name:$new_version"
-
-          pushd infrastructure_templates/bicep
-
-          az bicep install
-          
-          az bicep publish --file $file --target $target
-
-          popd
-
+          # This script will only work on existing image repos. We will test this and set to null otherwise
