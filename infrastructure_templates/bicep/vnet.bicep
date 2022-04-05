@@ -30,3 +30,5 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   }
   tags: tags
 }
+
+output vnet_id string = virtualNetwork.id
