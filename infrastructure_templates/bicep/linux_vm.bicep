@@ -51,8 +51,6 @@ resource vm_nic 'Microsoft.Network/networkInterfaces@2020-05-01' = {
         name: 'ipconfig1'
         properties: {
           privateIPAllocationMethod: privateIPAllocationMethod
-          publicIPAddress: {
-          }
           subnet: {
             id: subnetId
           }
