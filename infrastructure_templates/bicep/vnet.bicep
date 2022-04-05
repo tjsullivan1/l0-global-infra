@@ -32,3 +32,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
 }
 
 output vnet_id string = virtualNetwork.id
+output subnets array = [for (subnet, i) in subnets: {
+  subnet_name: virtualNetwork.properties.subnets[i].name 
+  subnet_id: virtualNetwork.properties.subnets[i].id 
+}]
