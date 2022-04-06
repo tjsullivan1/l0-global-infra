@@ -2,7 +2,7 @@
 param resourceName string
 
 @description('The location of AKS resource.')
-param location string
+param location string = resourceGroup().location
 
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN.')
 param dnsPrefix string
