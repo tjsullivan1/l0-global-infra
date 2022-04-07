@@ -20,10 +20,14 @@ resource publicIp 'Microsoft.Network/publicIpAddresses@2020-05-01' = {
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2020-05-01' = {
+resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = {
   name: bastionHostName
   location: location
+  sku: {
+     name: 'Standard'
+  }
   properties: {
+    enableTunneling: true
     ipConfigurations: [
       {
         name: 'IpConf'
