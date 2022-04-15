@@ -29,9 +29,9 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
       name: subnet.name
       properties: {
         addressPrefix: subnet.subnetPrefix
-        networkSecurityGroup: {
-          id: empty(nsg_id) ? null : nsg_id
-        }
+        networkSecurityGroup: (!empty(nsg_id)) ? { 
+          id: nsg_id 
+        } : json('null')
         privateEndpointNetworkPolicies: subnet.PEpol
         privateLinkServiceNetworkPolicies: subnet.PLSpol
       }
