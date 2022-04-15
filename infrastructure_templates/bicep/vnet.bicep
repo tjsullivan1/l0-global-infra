@@ -3,10 +3,14 @@ param location string = resourceGroup().location
 
 param addressPrefix string = '10.0.0.0/16'
 
+param nsg_id string = ''
+
 param subnets array = [
   {
     name: 'sub1'
     subnetPrefix: '10.0.0.0/24'
+    PEpol: true
+    PLSpol: true
   }
 ]
 
@@ -25,6 +29,11 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
       name: subnet.name
       properties: {
         addressPrefix: subnet.subnetPrefix
+        networkSecurityGroup: {
+          id: empty(nsg_id) ? null : nsg_id
+        }
+        privateEndpointNetworkPolicies: subnet.PEpol
+        privateLinkServiceNetworkPolicies: subnet.PLSpol
       }
     }]
   }
