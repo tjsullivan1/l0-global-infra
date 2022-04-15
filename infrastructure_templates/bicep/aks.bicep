@@ -13,8 +13,7 @@ param dnsPrefix string
 param osDiskSizeGB int = 0
 
 @description('The version of Kubernetes.')
-param kubernetesVersion string = '1.7.7'
-
+param kubernetesVersion string = '1.22.6'
 @description('Network plugin used for building Kubernetes network.')
 @allowed([
   'azure'
