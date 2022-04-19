@@ -10,6 +10,7 @@ param subnets array = [
     subnetPrefix: '10.0.0.0/24'
     PEpol: true
     PLSpol: true
+    natgw_id: ''
   }
 ]
 
@@ -28,6 +29,9 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
       name: subnet.name
       properties: {
         addressPrefix: subnet.subnetPrefix
+        natGateway: (!empty(subnet.natgw_id)) ? {
+          id: subnet.natgw_id
+        } : json('null')
         networkSecurityGroup: (!empty(subnet.nsg_id)) ? { 
           id: subnet.nsg_id 
         } : json('null')
