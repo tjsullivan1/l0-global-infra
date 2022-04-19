@@ -35,6 +35,7 @@ sudo apt upgrade -y
   '20_04-lts-gen2'
 ])
 param ubuntuOSVersion string = '18_04-lts-gen2'
+param load_balancer_pool_id string = ''
 
 // TODO: Add description and allowed values
 param privateIPAllocationMethod string = 'Dynamic'
@@ -54,6 +55,11 @@ resource vm_nic 'Microsoft.Network/networkInterfaces@2020-05-01' = {
           subnet: {
             id: subnetId
           }
+          loadBalancerBackendAddressPools: (!empty(load_balancer_pool_id)) ? [
+            {
+              id: load_balancer_pool_id
+            }
+          ] : json('null')
         }
       }
     ]
