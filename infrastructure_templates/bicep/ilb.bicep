@@ -7,7 +7,7 @@ param subnetId string
 param loadBalancerName string = 'ilb'
 
 param tcp_port int = 80
-param static_ip string 
+param static_ip string = ''
 
 resource lb 'Microsoft.Network/loadBalancers@2020-06-01' = {
   name: loadBalancerName
@@ -22,8 +22,8 @@ resource lb 'Microsoft.Network/loadBalancers@2020-06-01' = {
           subnet: {
             id: subnetId
           }
-          privateIPAddress: static_ip
-          privateIPAllocationMethod: 'Static'
+          privateIPAddress:  (!empty(static_ip)) ?  static_ip : json('null')
+          privateIPAllocationMethod: 'Dynamic'
         }
         name: 'LoadBalancerFrontend'
       }
@@ -49,6 +49,10 @@ resource lb 'Microsoft.Network/loadBalancers@2020-06-01' = {
           frontendPort: tcp_port
           backendPort: tcp_port
           idleTimeoutInMinutes: 15
+          enableTcpReset: true
+          disableOutboundSnat: false
+          loadDistribution: 'Default'
+          enableFloatingIP: false
         }
         name: 'lbrule'
       }
