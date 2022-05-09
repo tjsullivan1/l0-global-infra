@@ -7,6 +7,9 @@ param location string = resourceGroup().location
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN.')
 param dnsPrefix string
 
+@description('The name for the Azure Container Registry that we are going to connect Kubernetes to.')
+param acrName string
+
 @description('Disk size (in GiB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize.')
 @minValue(0)
 @maxValue(1023)
@@ -23,7 +26,6 @@ param networkPlugin string
 
 @description('Boolean flag to turn on and off of RBAC.')
 param enableRBAC bool = true
-
 
 @description('Enable private network access to the Kubernetes cluster.')
 param enablePrivateCluster bool = false
@@ -52,7 +54,16 @@ param dnsServiceIP string
 @description('A CIDR notation IP for Docker bridge.')
 param dockerBridgeCidr string
 
-resource resourceName_resource 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
+resource acr 'Microsoft.ContainerRegistry/registries@2021-12-01-preview' existing = {
+  name: acrName
+}
+
+resource acrPullRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+  scope: subscription()
+}
+
+resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
   location: location
   name: resourceName
   properties: {
@@ -118,4 +129,17 @@ resource resourceName_resource 'Microsoft.ContainerService/managedClusters@2021-
   dependsOn: []
 }
 
-output controlPlaneFQDN string = resourceName_resource.properties.fqdn
+resource acrKubeletAcrPullRole_roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  scope: acr
+  name: guid(aks_mc.id, acrPullRole.id)
+  properties: {
+    roleDefinitionId: acrPullRole.id
+    description: 'Allows AKS to pull container images from this ACR instance.'
+    principalId: aks_mc.properties.identityProfile.kubeletidentity.objectId
+    principalType: 'ServicePrincipal'
+  }
+  dependsOn: []
+}
+
+
+output controlPlaneFQDN string = aks_mc.properties.fqdn
