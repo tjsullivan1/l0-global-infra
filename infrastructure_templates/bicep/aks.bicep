@@ -10,6 +10,9 @@ param dnsPrefix string
 @description('The name for the Azure Container Registry that we are going to connect Kubernetes to.')
 param acrName string
 
+@description('The name for the resource group holding Azure Container Registry that we are going to connect Kubernetes to.')
+param acrRg string = resourceGroup().name
+
 @description('Disk size (in GiB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize.')
 @minValue(0)
 @maxValue(1023)
@@ -56,6 +59,7 @@ param dockerBridgeCidr string
 
 resource acr 'Microsoft.ContainerRegistry/registries@2021-12-01-preview' existing = {
   name: acrName
+  scope: resourceGroup(acrRg)
 }
 
 resource acrPullRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
