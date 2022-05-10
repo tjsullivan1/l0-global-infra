@@ -54,6 +54,13 @@ param dnsServiceIP string
 @description('A CIDR notation IP for Docker bridge.')
 param dockerBridgeCidr string
 
+var privateDNSZone = '${dnsPrefix}.privatelink.${location}.azmk8s.io'
+
+resource private_dns 'Microsoft.Network/privateDnsZones@2020-06-01' = if (enablePrivateCluster) {
+  name: privateDNSZone
+  location: 'global'
+}
+
 resource acr 'Microsoft.ContainerRegistry/registries@2021-12-01-preview' existing = {
   name: acrName
 }
@@ -67,6 +74,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
   location: location
   name: resourceName
   properties: {
+    
     kubernetesVersion: kubernetesVersion
     enableRBAC: enableRBAC
     dnsPrefix: dnsPrefix
@@ -102,6 +110,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
     }
     apiServerAccessProfile: {
       enablePrivateCluster: enablePrivateCluster
+      privateDNSZone: enablePrivateCluster ? private_dns.id : null
     }
     addonProfiles: {
       httpApplicationRouting: {
