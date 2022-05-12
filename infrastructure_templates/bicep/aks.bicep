@@ -15,6 +15,18 @@ param acrName string
 @maxValue(1023)
 param osDiskSizeGB int = 0
 
+@minValue(1)
+param node_default_count int = 3
+
+@minValue(1)
+param node_minimum_count int = 1
+
+param node_maximum_count int = 5
+
+param node_sku string = 'Standard_DS2_v2'
+
+param max_pods int = 110
+
 @description('The version of Kubernetes.')
 param kubernetesVersion string = '1.22.6'
 @description('Network plugin used for building Kubernetes network.')
@@ -54,11 +66,46 @@ param dnsServiceIP string
 @description('A CIDR notation IP for Docker bridge.')
 param dockerBridgeCidr string
 
+param availability_zones array = [
+  '1'
+  '2'
+  '3'
+]
+
+param userIdentity string = ''
+param miPrincipalId string = ''
+
+var isUserIdentityNull = empty(userIdentity)
+// var calculatedUserIdentity = '${userIdentity}' : {}
 var privateDNSZone = '${dnsPrefix}.privatelink.${location}.azmk8s.io'
+var identity = isUserIdentityNull ? {
+  type: 'SystemAssigned'
+} : { 
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userIdentity}' : {}
+    } 
+}
 
 resource private_dns 'Microsoft.Network/privateDnsZones@2020-06-01' = if (enablePrivateCluster) {
   name: privateDNSZone
   location: 'global'
+}
+
+resource role_assignment_private_dns_contributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (enablePrivateCluster) {
+  name: guid(subscription().id, 'principalIdtjsPrivDns', miPrincipalId)
+  properties: {
+    principalId: miPrincipalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'b12aa53e-6015-4669-85d0-8515ebb3ae7f')
+  }
+}
+
+resource role_assignment_net_contributor 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = if (enablePrivateCluster) {
+  name: guid(subscription().id, 'principalIdtjsNetCont', miPrincipalId)
+  properties: {
+    principalId: miPrincipalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')
+  }
 }
 
 resource acr 'Microsoft.ContainerRegistry/registries@2021-12-01-preview' existing = {
@@ -82,20 +129,16 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
       {
         name: 'agentpool'
         osDiskSizeGB: osDiskSizeGB
-        count: 3
+        count: node_default_count
         enableAutoScaling: true
-        minCount: 1
-        maxCount: 5
-        vmSize: 'Standard_DS2_v2'
+        minCount: node_minimum_count
+        maxCount: node_maximum_count
+        vmSize: node_sku
         osType: 'Linux'
         type: 'VirtualMachineScaleSets'
         mode: 'System'
-        maxPods: 110
-        availabilityZones: [
-          '1'
-          '2'
-          '3'
-        ]
+        maxPods: max_pods
+        availabilityZones: availability_zones
         enableNodePublicIP: false
         tags: {}
         vnetSubnetID: vnetSubnetID
@@ -132,9 +175,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
     name: 'Basic'
     tier: 'Paid'
   }
-  identity: {
-    type: 'SystemAssigned'
-  }
+  identity: identity
   dependsOn: []
 }
 
@@ -152,3 +193,5 @@ resource acrKubeletAcrPullRole_roleAssignment 'Microsoft.Authorization/roleAssig
 
 
 output controlPlaneFQDN string = aks_mc.properties.fqdn
+output controlPlanePrivateFQDN string = enablePrivateCluster ? aks_mc.properties.privateFQDN : ''
+output aksResourceId string = aks_mc.id
