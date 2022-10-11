@@ -28,7 +28,7 @@ param node_sku string = 'Standard_DS2_v2'
 param max_pods int = 110
 
 @description('The version of Kubernetes.')
-param kubernetesVersion string = '1.24'
+param kubernetesVersion string = '1.24.6'
 @description('Network plugin used for building Kubernetes network.')
 @allowed([
   'azure'
