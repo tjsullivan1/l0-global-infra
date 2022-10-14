@@ -27,6 +27,9 @@ param node_sku string = 'Standard_DS2_v2'
 
 param max_pods int = 110
 
+@description('The resource ID for the log analytics workspace')
+param logAnalyticsWorkspaceId string = ''
+
 @description('The version of Kubernetes.')
 param kubernetesVersion string = '1.24.6'
 @description('Network plugin used for building Kubernetes network.')
@@ -167,6 +170,9 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
       }
       omsAgent: {
         enabled: enableOmsAgent
+        config:  enableOmsAgent ? {
+          logAnalyticsWorkspaceResourceID: logAnalyticsWorkspaceId
+        } : null
       }
     }
   }
