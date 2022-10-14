@@ -79,6 +79,14 @@ param userIdentity string = ''
 param miPrincipalId string = ''
 param authorizedIPRanges array = []
 
+@description('Which network policy are you applying to the network.')
+@allowed([
+  'calico'
+  'azure'
+  ''
+])
+param networkPolicy string = ''
+
 var isUserIdentityNull = empty(userIdentity)
 // var calculatedUserIdentity = '${userIdentity}' : {}
 var privateDNSZone = '${dnsPrefix}.privatelink.${location}.azmk8s.io'
@@ -152,6 +160,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
       loadBalancerSku: 'standard'
       networkPlugin: networkPlugin
       serviceCidr: serviceCidr
+      networkPolicy: networkPolicy
       dnsServiceIP: dnsServiceIP
       dockerBridgeCidr: dockerBridgeCidr
     }
@@ -203,3 +212,4 @@ resource acrKubeletAcrPullRole_roleAssignment 'Microsoft.Authorization/roleAssig
 output controlPlaneFQDN string = aks_mc.properties.fqdn
 output controlPlanePrivateFQDN string = enablePrivateCluster ? aks_mc.properties.privateFQDN : ''
 output aksResourceId string = aks_mc.id
+output kvIdentityClientId string = aks_mc.properties.addonProfiles.azureKeyvaultSecretsProvider.identity.clientId
