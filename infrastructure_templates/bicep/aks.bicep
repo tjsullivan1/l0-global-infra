@@ -77,6 +77,7 @@ param availability_zones array = [
 
 param userIdentity string = ''
 param miPrincipalId string = ''
+param authorizedIPRanges array = []
 
 var isUserIdentityNull = empty(userIdentity)
 // var calculatedUserIdentity = '${userIdentity}' : {}
@@ -157,6 +158,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
     apiServerAccessProfile: {
       enablePrivateCluster: enablePrivateCluster
       privateDNSZone: enablePrivateCluster ? private_dns.id : null
+      authorizedIPRanges: authorizedIPRanges
     }
     addonProfiles: {
       httpApplicationRouting: {
