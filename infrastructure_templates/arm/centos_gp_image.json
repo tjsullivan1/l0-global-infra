@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "imageTemplateName": {
+        "type": "string"
+        },
+        "api-version": {
+          "type": "string",
+          "defaultValue": "2022-02-14"
+        },
+        "svclocation": {
+            "type": "string"
+        },
+        "userIdentity": {
+            "type": "string",
+            "defaultValue": "/subscriptions/8b63fe10-d76a-4f8f-81ce-7a5a8b911779/resourcegroups/rg-images/providers/Microsoft.ManagedIdentity/userAssignedIdentities/aibIdentity1615322949"
+        },
+        "sigId": {
+            "type": "string",
+            "defaultValue": "/subscriptions/8b63fe10-d76a-4f8f-81ce-7a5a8b911779/resourceGroups/rg-images/providers/Microsoft.Compute/galleries/sigseaib/images/gp_nvme"
+        }
+    },
+    
+    "variables": {
+    },
+
+
+    "resources": [
+      {
+        "name": "[parameters('imageTemplateName')]",
+        "type": "Microsoft.VirtualMachineImages/imageTemplates",
+        "apiVersion": "[parameters('api-version')]",
+        "location": "[parameters('svclocation')]",
+        "dependsOn": [],
+        "tags": {
+            "imagebuilderTemplate": "AzureImageBuilderSIG",
+            "userIdentity": "enabled"
+        },
+        "identity": {
+            "type": "UserAssigned",
+            "userAssignedIdentities": {
+                "[parameters('userIdentity')]": {}
+            }
+        },
+        
+        "properties": {
+            "buildTimeoutInMinutes" : 240,
+
+            "vmProfile": 
+                    {
+                    "vmSize": "Standard_D8_v3",
+                    "osDiskSizeGB": 30
+                    },
+        
+            "source": {
+                "type": "PlatformImage",
+                    "publisher": "OpenLogic",
+                    "offer": "CentOS",
+                    "sku": "7_9-gen2",
+                    "version": "latest"
+            },
+            "customize": [
+                {
+                    "type": "Shell",
+                    "name": "Update OS",
+                    "scriptUri": "https://raw.githubusercontent.com/tjsullivan1/tjs-scripts/master/bash/centos7-update.sh",
+                },
+     
+
+            ],
+            "distribute": 
+            [
+                {   
+                    "type": "SharedImage",
+                    "galleryImageId": "[parameters('sigId')]",
+                    "runOutputName": "run-linux",
+                    "artifactTags": {
+                        "source": "CentOS",
+                        "baseosimg": "CentOS79"
+                    },
+                    "replicationRegions": [
+                      "eastus",
+                      "northcentralus"
+                    ]
+                }
+            ]
+            }
+        }
+
+    
+    ]
+}    
