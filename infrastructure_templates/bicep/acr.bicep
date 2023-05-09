@@ -21,7 +21,7 @@ param acrSku string = 'Basic'
 param submitted_tags object = {}
 
 // azure container registry
-resource acr 'Microsoft.ContainerRegistry/registries@2019-12-01-preview' = {
+resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
   name: acrName
   location: location
   tags: submitted_tags
