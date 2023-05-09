@@ -5,7 +5,7 @@ param resourceName string
 param location string = resourceGroup().location
 
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN.')
-param dnsPrefix string
+param dnsPrefix string = ''
 
 @description('The name for the Azure Container Registry that we are going to connect Kubernetes to.')
 param acrName string
@@ -31,7 +31,7 @@ param max_pods int = 110
 param logAnalyticsWorkspaceId string = ''
 
 @description('The version of Kubernetes.')
-param kubernetesVersion string = '1.24.6'
+param kubernetesVersion string = '1.26.3'
 @description('Network plugin used for building Kubernetes network.')
 @allowed([
   'azure'
@@ -129,7 +129,7 @@ resource acrPullRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview
   scope: subscription()
 }
 
-resource aks_mc 'Microsoft.ContainerService/managedClusters@2021-07-01' = {
+resource aks_mc 'Microsoft.ContainerService/managedClusters@2023-02-01' = {
   location: location
   name: resourceName
   properties: {
