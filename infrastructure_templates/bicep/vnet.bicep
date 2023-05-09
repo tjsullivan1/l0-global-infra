@@ -8,15 +8,15 @@ param subnets array = [
     name: 'sub1'
     nsg_id: ''
     subnetPrefix: '10.0.0.0/24'
-    PEpol: true
-    PLSpol: true
+    PEpol: 'Enabled'
+    PLSpol: 'Enabled'
     natgw_id: ''
   }
 ]
 
 param tags object = {}
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' = {
   name: virtualNetworkName
   location: location
   properties: {
@@ -31,10 +31,10 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         addressPrefix: subnet.subnetPrefix
         natGateway: (!empty(subnet.natgw_id)) ? {
           id: subnet.natgw_id
-        } : json('null')
+        } : null
         networkSecurityGroup: (!empty(subnet.nsg_id)) ? { 
           id: subnet.nsg_id 
-        } : json('null')
+        } : null
         privateEndpointNetworkPolicies: subnet.PEpol
         privateLinkServiceNetworkPolicies: subnet.PLSpol
       }
