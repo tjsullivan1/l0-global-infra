@@ -189,7 +189,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2023-02-01' = {
   }
   tags: {}
   sku: {
-    name: 'Basic'
+    name: 'Base'
     tier: 'Paid'
   }
   identity: identity
