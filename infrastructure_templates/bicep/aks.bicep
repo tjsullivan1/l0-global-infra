@@ -60,6 +60,7 @@ param enableOmsAgent bool = false
 @description('Resource ID of virtual network subnet used for nodes and/or pods IP assignment.')
 param vnetSubnetID string
 
+/*
 @description('A CIDR notation IP range from which to assign service cluster IPs.')
 param serviceCidr string
 
@@ -68,6 +69,7 @@ param dnsServiceIP string
 
 @description('A CIDR notation IP for Docker bridge.')
 param dockerBridgeCidr string
+*/
 
 param availability_zones array = [
   '1'
@@ -159,10 +161,7 @@ resource aks_mc 'Microsoft.ContainerService/managedClusters@2023-02-01' = {
     networkProfile: {
       loadBalancerSku: 'standard'
       networkPlugin: networkPlugin
-      serviceCidr: serviceCidr
       networkPolicy: networkPolicy
-      dnsServiceIP: dnsServiceIP
-      dockerBridgeCidr: dockerBridgeCidr
     }
     apiServerAccessProfile: {
       enablePrivateCluster: enablePrivateCluster
